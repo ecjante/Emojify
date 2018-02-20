@@ -17,6 +17,9 @@ import com.google.android.gms.vision.face.FaceDetector;
 public class Emojifier {
     private static final String TAG = Emojifier.class.getSimpleName();
 
+    private static final double SMILING_PROB_THRESHOLD = .15;
+    private static final double EYE_OPEN_PROB_THRESHOLD = .5;
+
     public static void detectFaces(Context context, Bitmap bitmap) {
         FaceDetector detector = new FaceDetector.Builder(context)
                 .setTrackingEnabled(false)
@@ -37,20 +40,60 @@ public class Emojifier {
             for (int i = 0; i < faces.size(); i++) {
                 Face face = faces.valueAt(i);
                 Log.d(TAG, "detectFaces: Face classification for face " + i);
-                getClassifications(face);
+                whichEmoji(face);
             }
         }
 
         detector.release();
     }
 
-    public static void getClassifications(Face face) {
+    public static void whichEmoji(Face face) {
         float leftEyeOpenProbability = face.getIsLeftEyeOpenProbability();
         float rightEyeOpenProbability = face.getIsRightEyeOpenProbability();
         float smilingProbability = face.getIsSmilingProbability();
 
-        Log.d(TAG, "getClassifications: Left eye open probability: " + leftEyeOpenProbability);
-        Log.d(TAG, "getClassifications: Right eye open probability: " + rightEyeOpenProbability);
-        Log.d(TAG, "getClassifications: Smiling probability: " + smilingProbability);
+        Log.d(TAG, "whichEmoji: Left eye open probability: " + leftEyeOpenProbability);
+        Log.d(TAG, "whichEmoji: Right eye open probability: " + rightEyeOpenProbability);
+        Log.d(TAG, "whichEmoji: Smiling probability: " + smilingProbability);
+
+        boolean smiling = smilingProbability > SMILING_PROB_THRESHOLD;
+        boolean rightEyeClosed = rightEyeOpenProbability < EYE_OPEN_PROB_THRESHOLD;
+        boolean leftEyeClosed = leftEyeOpenProbability < EYE_OPEN_PROB_THRESHOLD;
+
+        Emoji emoji;
+        if(smiling) {
+            if (leftEyeClosed && !rightEyeClosed) {
+                emoji = Emoji.LEFT_WINK;
+            }  else if(rightEyeClosed && !leftEyeClosed){
+                emoji = Emoji.RIGHT_WINK;
+            } else if (leftEyeClosed){
+                emoji = Emoji.CLOSED_EYE_SMILE;
+            } else {
+                emoji = Emoji.SMILE;
+            }
+        } else {
+            if (leftEyeClosed && !rightEyeClosed) {
+                emoji = Emoji.LEFT_WINK_FROWN;
+            }  else if(rightEyeClosed && !leftEyeClosed){
+                emoji = Emoji.RIGHT_WINK_FROWN;
+            } else if (leftEyeClosed){
+                emoji = Emoji.CLOSED_EYE_FROWN;
+            } else {
+                emoji = Emoji.FROWN;
+            }
+        }
+
+        Log.d(TAG, "whichEmoji: " + emoji.name());
+    }
+
+    private enum Emoji {
+        SMILE,
+        FROWN,
+        LEFT_WINK,
+        RIGHT_WINK,
+        LEFT_WINK_FROWN,
+        RIGHT_WINK_FROWN,
+        CLOSED_EYE_SMILE,
+        CLOSED_EYE_FROWN
     }
 }
