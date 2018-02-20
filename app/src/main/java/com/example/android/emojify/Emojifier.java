@@ -33,8 +33,24 @@ public class Emojifier {
 
         if (faces.size() == 0) {
             Toast.makeText(context, "No faces detected", Toast.LENGTH_LONG).show();
+        } else {
+            for (int i = 0; i < faces.size(); i++) {
+                Face face = faces.valueAt(i);
+                Log.d(TAG, "detectFaces: Face classification for face " + i);
+                getClassifications(face);
+            }
         }
 
         detector.release();
+    }
+
+    public static void getClassifications(Face face) {
+        float leftEyeOpenProbability = face.getIsLeftEyeOpenProbability();
+        float rightEyeOpenProbability = face.getIsRightEyeOpenProbability();
+        float smilingProbability = face.getIsSmilingProbability();
+
+        Log.d(TAG, "getClassifications: Left eye open probability: " + leftEyeOpenProbability);
+        Log.d(TAG, "getClassifications: Right eye open probability: " + rightEyeOpenProbability);
+        Log.d(TAG, "getClassifications: Smiling probability: " + smilingProbability);
     }
 }
