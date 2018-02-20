@@ -12,6 +12,8 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import timber.log.Timber;
+
 /**
  * Created by enrico on 2/20/18.
  */
@@ -91,9 +93,9 @@ public class Emojifier {
         float rightEyeOpenProbability = face.getIsRightEyeOpenProbability();
         float smilingProbability = face.getIsSmilingProbability();
 
-        Log.d(TAG, "whichEmoji: Left eye open probability: " + leftEyeOpenProbability);
-        Log.d(TAG, "whichEmoji: Right eye open probability: " + rightEyeOpenProbability);
-        Log.d(TAG, "whichEmoji: Smiling probability: " + smilingProbability);
+        Timber.d("whichEmoji: Left eye open probability: " + leftEyeOpenProbability);
+        Timber.d("whichEmoji: Right eye open probability: " + rightEyeOpenProbability);
+        Timber.d("whichEmoji: Smiling probability: " + smilingProbability);
 
         boolean smiling = smilingProbability > SMILING_PROB_THRESHOLD;
         boolean rightEyeClosed = rightEyeOpenProbability < EYE_OPEN_PROB_THRESHOLD;
@@ -122,7 +124,7 @@ public class Emojifier {
             }
         }
 
-        Log.d(TAG, "whichEmoji: " + emoji.name());
+        Timber.d("whichEmoji: " + emoji.name());
         return emoji;
     }
 
